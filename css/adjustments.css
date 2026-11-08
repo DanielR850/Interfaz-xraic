@@ -350,3 +350,19 @@
 #page-historial .history-group-label h2 { font-size: 19px; margin: 0; }
 #page-historial .history-group-label p { color: var(--muted); font-size: 13px; margin: 2px 0 0; }
 #page-historial .history-record-actions button { white-space: nowrap; }
+
+/* Consulta: nueva conversación sin buscador visible de expedientes. */
+#page-consulta .consultation-heading-row {
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:20px;
+ flex-wrap:wrap;
+}
+#page-consulta .consultation-heading-row > div { flex:1 1 280px; min-width:0; }
+#page-consulta .consultation-new-chat { flex:0 0 auto; display:inline-flex; align-items:center; gap:9px; }
+#page-consulta .case-chooser.hidden { display:none!important; }
+@media(max-width:600px) {
+ #page-consulta .consultation-heading-row { gap:12px; }
+ #page-consulta .consultation-new-chat { margin-left:auto; }
+}
