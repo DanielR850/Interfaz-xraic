@@ -147,31 +147,51 @@
 .report-field-duplicates{display:grid;gap:3px;font-size:13px;font-weight:600}
 .report-field-duplicates>div{overflow-wrap:anywhere}
 
-/* ÍNDICE FIJO REAL. Posicionamos el ASIDE, no la caja interna:
-   anteriormente el índice quedaba limitado por la altura del grid item. */
+/* Reporte según distribución de dos columnas: CONTENIDO | REPORTE.
+   Únicamente escritorio; el contenido original, colores y demás páginas no cambian.
+   La columna de Contenido es fija y nunca se superpone al encabezado del reporte. */
 @media screen and (min-width: 781px) {
-  #page-reporte #reportContent.report-layout {
+  #page-reporte.active {
     display: grid;
     grid-template-columns: 235px minmax(0, 1fr);
+    column-gap: 25px;
     align-items: start;
   }
-  #page-reporte #reportContent.report-layout > .report-index {
+  #page-reporte > .page-heading {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    margin: 0 0 26px;
+  }
+  #page-reporte > #reportEmpty {
+    grid-column: 2;
+  }
+  #page-reporte > #reportContent.report-layout:not(.hidden) {
+    display: contents;
+  }
+  #page-reporte #reportContent > #reportDocument {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+  }
+  #page-reporte #reportContent > .report-index {
     position: fixed;
     z-index: 12;
     top: 84px;
     left: max(26px, calc((100vw - var(--max)) / 2 + 26px));
     width: 235px;
-    max-height: calc(100vh - 100px);
-    max-height: calc(100dvh - 100px);
+    height: calc(100vh - 84px);
+    height: calc(100dvh - 84px);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
     background: var(--paper);
     border: 1px solid var(--border);
+    border-top: 0;
     border-radius: 0;
     padding: 0;
   }
-  #page-reporte #reportContent.report-layout > .report-index > .sticky-index {
+  #page-reporte #reportContent > .report-index > .sticky-index {
     position: static;
     top: auto;
     overflow: visible;
@@ -181,11 +201,13 @@
     border-radius: 0;
     background: transparent;
   }
-  #page-reporte #reportContent.report-layout > #reportDocument {
-    grid-column: 2;
-  }
   #page-reporte .report-index a {
     border-radius: 0;
     padding: 9px 10px;
   }
+}
+/* En impresión se recupera el documento de una sola columna. */
+@media print {
+  #page-reporte.active { display: block !important; }
+  #page-reporte > #reportContent.report-layout:not(.hidden) { display: block !important; }
 }
