@@ -147,26 +147,37 @@
 .report-field-duplicates{display:grid;gap:3px;font-size:13px;font-weight:600}
 .report-field-duplicates>div{overflow-wrap:anywhere}
 
-/* Índice de Reporte: la columna ocupa toda la altura del documento.
-   El panel interior (no su columna contenedora) sigue al scroll. */
+/* Índice rectangular fijo e independiente del scroll del documento.
+   Solo en escritorio y solo en Reporte. En móvil conserva navegación horizontal. */
 @media screen and (min-width: 781px) {
   #page-reporte .report-layout {
-    align-items: stretch;
+    align-items: start;
   }
   #page-reporte .report-index {
-    position: relative;
-    top: auto;
-    align-self: stretch;
+    position: static;
+    align-self: start;
     overflow: visible;
-    max-height: none;
     min-width: 0;
   }
   #page-reporte .report-index .sticky-index {
-    position: sticky;
-    top: 88px;
-    max-height: calc(100vh - 104px);
+    position: fixed;
+    top: 84px;
+    left: max(26px, calc((100vw - var(--max)) / 2 + 26px));
+    width: 235px;
+    height: auto;
+    max-height: calc(100dvh - 100px);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
+    border-radius: 0;
+    z-index: 9;
+  }
+  #page-reporte .report-index a {
+    border-radius: 0;
+    font-weight: 600;
+    padding: 9px 10px;
+  }
+  #page-reporte .report-index a.active {
+    font-weight: 700;
   }
 }
