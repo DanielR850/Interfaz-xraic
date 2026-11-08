@@ -123,17 +123,40 @@ function submit(question){let u=U();question=question.trim();if(!question)return
    ||syntheticCases().find(c=>c.identity.name&&q.includes(u.normalize(c.identity.name)));
   if(match){openSyntheticChat(match.id);appendUser(question);const response=syntheticAnswer(match,question);appendAI(response.html,null,response.topic);saveSyntheticHistory(match,question,response.topic);return;}
  }if(!u.state.record){let matches=findRecord(question);u.$('#emptyConversation').classList.add('hidden');u.$('#chatWrap').classList.remove('hidden');appendUser(question);
- if(!matches.length){appendAI(`<p>No encontré una coincidencia suficientemente clara con esa descripción. Puedes incluir el motivo de atención, una fecha o buscar por clave sin escribir SQL.</p><button class="btn secondary small" type="button" data-open-chooser>Buscar por clave</button>`,null,'Búsqueda documental');return}
+ if(!matches.length){appendAI(`<p>No encontré una coincidencia suficientemente clara con esa descripción. Puedes incluir el motivo de atención, la fecha o el identificador del expediente, o consultar los expedientes disponibles en Historial.</p><button class="btn secondary small" type="button" data-open-history>Ver historial de expedientes</button>`,null,'Búsqueda documental');return}
  if(matches.length>1){renderMatched(matches,question);return}
  u.choose(matches[0]);
  appendUser(question);
 }else appendUser(question);
 let rec=u.state.record,answer=answerFor(question,rec);if(!u.$('#chatMessages').querySelector('.message.ai'))showRecordIntro(rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);u.state.turns.push({question,topic:answer.topic,answer:answer.body});saveHistory(question,rec,answer);u.$('#composerStatus').textContent='Consultando '+rec.title+' · Puedes seguir preguntando';}
-function init(){let u=U();u.answer=submit;u.showRecordIntro=showRecordIntro;u.openSyntheticChat=openSyntheticChat;
+function newChat(){
+ const u=U();
+ u.state.record=null;
+ u.state.syntheticCase=null;
+ u.state.turns=[];
+ u.state.voice=0;
+ pendingQuestion='';
+ u.$('#chatMessages').innerHTML='';
+ u.$('#chatInput').value='';
+ u.$('#emptyConversation').classList.remove('hidden');
+ u.$('#chatWrap').classList.add('hidden');
+ u.$('#chatContext').textContent='Expediente';
+ u.$('#activeRecordLabel').textContent='';
+ u.$('#caseHint').textContent='';
+ u.$('#caseDropdown').classList.add('hidden');
+ u.$('#composerStatus').textContent='Describe el caso o pregunta por un expediente';
+ u.$('#voiceStatus').textContent='';
+ u.$('#voiceStatus').className='voice-state';
+ u.$('#voiceButton').innerHTML=u.svg('mic');
+ u.$('#voiceButton').title='Iniciar grabación';
+ u.$('#chatInput').focus();
+ // El historial local de expedientes y preguntas se conserva.
+}
+function init(){let u=U();u.answer=submit;u.showRecordIntro=showRecordIntro;u.openSyntheticChat=openSyntheticChat;u.newChat=newChat;u.$('#newChatButton').addEventListener('click',newChat);
  u.$('#chatForm').onsubmit=e=>{e.preventDefault();submit(u.$('#chatInput').value)};
  u.$('#chatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit(u.$('#chatInput').value)}};
  u.$('#emptySelect')?.addEventListener('click',u.openChooser);
- document.addEventListener('click',e=>{let quick=e.target.closest('[data-quick]');if(quick)submit(quick.dataset.quick);let matched=e.target.closest('[data-match]');if(matched){let rec=u.records.find(r=>r.id===matched.dataset.match);if(rec){let text=pendingQuestion||('Muéstrame una síntesis clínica del expediente '+rec.id);u.choose(rec);appendUser(text);showRecordIntro(rec);let answer=answerFor(text,rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);saveHistory(text,rec,answer);pendingQuestion='';}} let syntheticBtn=e.target.closest('[data-open-synthetic-report]');if(syntheticBtn&&typeof window.XRAIC_OPEN_SYNTHETIC_REPORT==='function'){window.XRAIC_OPEN_SYNTHETIC_REPORT(syntheticBtn.dataset.openSyntheticReport);window.history.replaceState(null,'','#reporte')} if(e.target.closest('[data-open-chooser]'))u.openChooser()});
+ document.addEventListener('click',e=>{let quick=e.target.closest('[data-quick]');if(quick)submit(quick.dataset.quick);let matched=e.target.closest('[data-match]');if(matched){let rec=u.records.find(r=>r.id===matched.dataset.match);if(rec){let text=pendingQuestion||('Muéstrame una síntesis clínica del expediente '+rec.id);u.choose(rec);appendUser(text);showRecordIntro(rec);let answer=answerFor(text,rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);saveHistory(text,rec,answer);pendingQuestion='';}} let syntheticBtn=e.target.closest('[data-open-synthetic-report]');if(syntheticBtn&&typeof window.XRAIC_OPEN_SYNTHETIC_REPORT==='function'){window.XRAIC_OPEN_SYNTHETIC_REPORT(syntheticBtn.dataset.openSyntheticReport);window.history.replaceState(null,'','#reporte')} if(e.target.closest('[data-open-history]')){u.showPage('historial');window.history.replaceState(null,'','#historial')}});
  u.$('#voiceButton').onclick=()=>{u.state.voice=(u.state.voice+1)%5;let texts=['','Grabando… Pulsa de nuevo para detener.','Transcribiendo audio…','Transcripción disponible para revisión.','No fue posible transcribir el audio.'];let icons=['mic','stop','mic','check','mic'];u.$('#voiceStatus').textContent=texts[u.state.voice];u.$('#voiceStatus').className='voice-state '+(u.state.voice===1?'recording':u.state.voice===2?'processing':'');u.$('#voiceButton').innerHTML=u.svg(icons[u.state.voice]);u.$('#voiceButton').title='Estado de audio: '+(texts[u.state.voice]||'En reposo');};}
 window.XRAIC_INIT_CONSULTA=init;
 })();
