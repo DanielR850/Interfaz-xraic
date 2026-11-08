@@ -171,6 +171,11 @@ function renderSynthetic(c){
 
 function render(){
  const u=U(),r=u.state.record,emptyEl=u.$('#reportEmpty'),content=u.$('#reportContent');
+ // Al regresar desde Analítica, tomar la selección compartida más reciente.
+ try {
+   const sharedId=sessionStorage.getItem(selectedCaseStorageKey);
+   if(sharedId)selectedSyntheticCase=syntheticCases().find(c=>c.id===sharedId)||selectedSyntheticCase;
+ } catch (_) {}
  if(selectedSyntheticCase||!r){renderSynthetic(selectedSyntheticCase||syntheticCases()[0]);return;}
  // If no record has been searched yet, make the new visual design reviewable using a fictional case.
  const showcase=!r, model=showcase?demo:r;
