@@ -147,67 +147,69 @@
 .report-field-duplicates{display:grid;gap:3px;font-size:13px;font-weight:600}
 .report-field-duplicates>div{overflow-wrap:anywhere}
 
-/* Reporte según distribución de dos columnas: CONTENIDO | REPORTE.
-   Únicamente escritorio; el contenido original, colores y demás páginas no cambian.
-   La columna de Contenido es fija y nunca se superpone al encabezado del reporte. */
+/* Reporte con estructura REAL en dos columnas según bosquejo aprobado.
+   El índice acompaña el scroll dentro del área del reporte, sin cubrir el encabezado.
+   No altera Consulta, Analítica, Historial ni Pruebas. */
+#page-reporte .report-workspace {
+  display: grid;
+  grid-template-columns: 235px minmax(0, 1fr);
+  align-items: stretch;
+  column-gap: 25px;
+  min-width: 0;
+}
+#page-reporte .report-main { min-width: 0; }
+#page-reporte .report-main > .page-heading { margin-bottom: 26px; }
+#page-reporte .report-main > #reportContent.report-layout:not(.hidden) {
+  display: block;
+}
+#page-reporte .report-main #reportDocument { width: 100%; min-width: 0; }
 @media screen and (min-width: 781px) {
-  #page-reporte.active {
-    display: grid;
-    grid-template-columns: 235px minmax(0, 1fr);
-    column-gap: 25px;
-    align-items: start;
-  }
-  #page-reporte > .page-heading {
-    grid-column: 2;
-    grid-row: 1;
-    min-width: 0;
-    margin: 0 0 26px;
-  }
-  #page-reporte > #reportEmpty {
-    grid-column: 2;
-  }
-  #page-reporte > #reportContent.report-layout:not(.hidden) {
-    display: contents;
-  }
-  #page-reporte #reportContent > #reportDocument {
-    grid-column: 2;
-    grid-row: 2;
-    min-width: 0;
-  }
-  #page-reporte #reportContent > .report-index {
-    position: fixed;
-    z-index: 12;
+  #page-reporte .report-workspace > .report-index {
+    position: sticky;
     top: 84px;
-    left: max(26px, calc((100vw - var(--max)) / 2 + 26px));
-    width: 235px;
-    height: calc(100vh - 84px);
-    height: calc(100dvh - 84px);
+    align-self: start;
+    min-height: 0;
+    height: auto;
+    max-height: calc(100vh - 100px);
+    max-height: calc(100dvh - 100px);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
-    background: var(--paper);
     border: 1px solid var(--border);
-    border-top: 0;
     border-radius: 0;
-    padding: 0;
+    background: var(--paper);
+    z-index: 5;
   }
-  #page-reporte #reportContent > .report-index > .sticky-index {
+  #page-reporte .report-workspace > .report-index > .sticky-index {
     position: static;
     top: auto;
-    overflow: visible;
     max-height: none;
+    overflow: visible;
     border: 0;
-    box-shadow: none;
     border-radius: 0;
+    box-shadow: none;
     background: transparent;
   }
-  #page-reporte .report-index a {
-    border-radius: 0;
-    padding: 9px 10px;
+  #page-reporte .report-index a { border-radius: 0; }
+}
+@media screen and (max-width: 780px) {
+  #page-reporte .report-workspace {
+    display: block;
+  }
+  #page-reporte .report-workspace > .report-index {
+    position: sticky;
+    top: 62px;
+    z-index: 8;
+    background: var(--bg);
+    padding: 5px 0 10px;
+    margin-bottom: 12px;
+  }
+  #page-reporte .report-workspace > .report-index .sticky-index {
+    position: static;
+    border-radius: 10px;
   }
 }
-/* En impresión se recupera el documento de una sola columna. */
 @media print {
-  #page-reporte.active { display: block !important; }
-  #page-reporte > #reportContent.report-layout:not(.hidden) { display: block !important; }
+  #page-reporte .report-workspace { display: block !important; }
+  #page-reporte .report-main > #reportContent.report-layout:not(.hidden) { display: block !important; }
 }
