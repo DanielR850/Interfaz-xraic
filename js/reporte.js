@@ -99,12 +99,17 @@ function composeForRecord(r){
 function syntheticField(label,value){
  const u=U();
  const isEmpty=value===null||value===undefined||value==='';
- const isConflict=typeof value==='object'&&Array.isArray(value.conflict);
- let content=isEmpty?'<em class="report-data-missing">No registrado</em>':isConflict
- ?`<div class="report-field-conflicts">${value.conflict.map(v=>`<div>${u.esc(v)}</div>`).join('')}<span>Requiere cotejo de fuentes</span></div>`
- :u.esc(value);
- const state=isEmpty?' is-missing':isConflict?' is-conflicted':'';
- return `<div class="report-identity-item${state}"><span>${u.esc(label)}</span><strong>${content}</strong></div>`;
+ const isConflict=value&&typeof value==='object'&&Array.isArray(value.conflict);
+ const isDuplicate=value&&typeof value==='object'&&Array.isArray(value.duplicate);
+ // Duplicado: un mismo dato repetido en varias fuentes. No equivale a discordancia.
+ const kind=isEmpty?'missing':isConflict?'conflicted':isDuplicate?'duplicated':'present';
+ const labelState={missing:'Sin registrar',conflicted:'Discordante',duplicated:'Duplicado',present:'Registrado'}[kind];
+ const renderValues=arr=>arr.map(v=>`<div>${u.esc(v)}</div>`).join('');
+ const content=isEmpty?'<em class="report-data-missing">No registrado</em>'
+  :isConflict?`<div class="report-field-conflicts">${renderValues(value.conflict)}</div>`
+  :isDuplicate?`<div class="report-field-duplicates">${renderValues(value.duplicate)}</div>`
+  :u.esc(value);
+ return `<div class="report-identity-item is-${kind}"><span class="report-field-label">${u.esc(label)}</span><strong>${content}</strong><small class="report-field-state">${labelState}</small></div>`;
 }
 function composeSynthetic(c){
  const u=U(),ident=c.identity||{};
@@ -113,9 +118,11 @@ function composeSynthetic(c){
  const hasHospital=c.id==='0001'||c.id==='0004';
  const outpatient=c.id==='0002'||c.id==='0007';
  const hasSurgery=c.id==='0001';
- const card=`<div class="report-patient-identification"><div class="report-patient-primary"><span>NOMBRE DEL PACIENTE</span><strong class="${ident.name?'':'report-name-missing'}">${u.esc(ident.name||'Nombre no registrado')}</strong>${ident.name?'':'<small>El identificador no reemplaza al nombre del paciente.</small>'}</div><div class="report-patient-secondary report-identity-panel">
- ${[['N.º de expediente',`EXP-${c.id}`],['Edad registrada',ident.age],['Sexo registrado',ident.sex],['Fecha de nacimiento',ident.birth],['Peso',ident.weight],['Talla / estatura',ident.height],['Alergias documentadas',ident.allergies],['Grupo sanguíneo',ident.blood],['Servicio',ident.service],['Fecha o periodo',ident.date]].map(x=>syntheticField(...x)).join('')}</div>
- <p class="report-small-context">Los datos sin registrar no se interpretan como normales ni se sustituyen por valores estimados. Los valores discordantes conservan sus fuentes y fechas.</p></div>`;
+ const card=`<div class="report-patient-identification">
+ <div class="report-identity-intro"><p>Información de identificación disponible en las fuentes. Cada campo distingue los datos registrados, ausentes, discordantes o duplicados.</p></div>
+ <div class="report-patient-secondary report-identity-panel">
+ ${[['Edad registrada',ident.age],['Sexo registrado',ident.sex],['Fecha de nacimiento',ident.birth],['Peso',ident.weight],['Talla / estatura',ident.height],['Alergias documentadas',ident.allergies],['Grupo sanguíneo',ident.blood],['Servicio',ident.service],['Fecha o periodo',ident.date]].map(x=>syntheticField(...x)).join('')}</div>
+ <p class="report-small-context">«No registrado» no significa negativo o normal. «Duplicado» indica que un mismo valor aparece repetido; «Discordante» identifica valores distintos que requieren cotejo.</p></div>`;
  const body={
  resumen:`<div class="report-overview">${P(c.overview)}</div><div class="report-analysis-note"><div class="report-analysis-title">Comentario de análisis documental</div>${P(c.analysis)}</div>${numbered([['Expediente',`EXP-${c.id}`],['Contexto',c.state],['Documentos base',`${c.sources.length} fuente(s)`]])}`,
  ingresos:card,
@@ -133,47 +140,6 @@ function composeSynthetic(c){
  };
  return body;
 }
-/* La selección actualiza una vista de los campos inmediatamente, sin navegar a otro apartado. */
-let quickFieldMode='all';
-function fieldStatus(value){
- if(value===null||value===undefined||value==='')return 'missing';
- if(value&&typeof value==='object'&&Array.isArray(value.conflict))return 'conflict';
- return 'present';
-}
-function renderQuickFields(c){
- const u=U(),d=c.identity||{};
- const fields=[
-  ['Nombre',d.name],['Edad',d.age],['Sexo',d.sex],
-  ['Fecha de nacimiento',d.birth],['Peso',d.weight],['Talla',d.height],
-  ['Alergias',d.allergies],['Grupo sanguíneo',d.blood],
-  ['Servicio',d.service],['Fecha de atención',d.date]
- ];
- const missing=fields.filter(x=>fieldStatus(x[1])==='missing').length;
- const conflicts=fields.filter(x=>fieldStatus(x[1])==='conflict').length;
- const selected=quickFieldMode==='pending' ? fields.filter(x=>fieldStatus(x[1])!=='present') : fields;
- const cells=selected.map(([label,value])=>{
-   const status=fieldStatus(value);
-   const content=status==='missing' ? '<span class="quick-missing">Sin registrar</span>' :
-    status==='conflict' ? '<span class="quick-conflict">'+value.conflict.map(v=>u.esc(v)).join(' / ')+'</span>' : u.esc(value);
-   const stateLabel=status==='missing'?'Dato ausente':status==='conflict'?'Datos discordantes':'Dato registrado';
-   return '<div class="report-quick-item status-'+status+'"><span class="quick-label">'+u.esc(label)+'</span><strong>'+content+'</strong><small>'+stateLabel+'</small></div>';
- }).join('');
- return '<section class="report-quick-compare" aria-label="Datos de identificación del expediente seleccionado">'+
-  '<div class="report-quick-heading"><div><h3>Identificación del paciente</h3><p>Expediente EXP-'+u.esc(c.id)+' · Los datos cambian al elegir otro expediente.</p></div>'+
-  '<div class="report-quick-counts"><span>'+missing+' sin registrar</span><span>'+conflicts+' discordantes</span></div></div>'+
-  '<div class="report-quick-controls" aria-label="Filtrar campos de identificación"><button type="button" class="quick-filter'+(quickFieldMode==='all'?' active':'')+'" data-quick-mode="all" aria-pressed="'+(quickFieldMode==='all')+'">Todos los campos</button>'+
-  '<button type="button" class="quick-filter'+(quickFieldMode==='pending'?' active':'')+'" data-quick-mode="pending" aria-pressed="'+(quickFieldMode==='pending')+'">Solo faltantes o discordantes</button></div>'+
-  '<div class="report-quick-fields">'+(cells||'<p class="report-quick-complete">No hay campos faltantes ni discordantes en esta ficha.</p>')+'</div></section>';
-}
-function bindQuickFilter(c){
- const u=U();
- u.$('#reportDocument').querySelectorAll('[data-quick-mode]').forEach(btn=>btn.addEventListener('click',()=>{
-   quickFieldMode=btn.dataset.quickMode;
-   const current=selectedSyntheticCase||c;
-   const box=u.$('.report-quick-compare');
-   if(box){box.outerHTML=renderQuickFields(current);bindQuickFilter(current)}
- }));
-}
 function renderSynthetic(c){
  if(!c)return;
  selectedSyntheticCase=c;
@@ -185,7 +151,7 @@ function renderSynthetic(c){
  const clinicalName=c.identity.name||'Nombre no registrado';
  const reportHeader=`<div class="report-scenario-bar"><label for="reportCaseSelect">Expediente</label><select id="reportCaseSelect" autocomplete="off" aria-label="Elegir expediente ficticio">${options}</select><span class="report-scenario-tag">${u.esc(c.state)}</span>${record?'<button type="button" class="btn ghost small" id="reportReturnRecord">Volver al expediente consultado</button>':''}</div>`;
  u.$('#reportToc').innerHTML=names.map(([key,label],i)=>`<a href="#r-${key}" data-anchor="r-${key}" class="${i===0?'active':''}">${String(i+1).padStart(2,'0')} · ${u.esc(label)}</a>`).join('');
- u.$('#reportDocument').innerHTML=reportHeader+renderQuickFields(c)+`<header class="report-cover report-cover-clinical report-patient-cover"><div class="overline">ASSIST · XRAIC / EXPEDIENTE CLÍNICO INTEGRADO</div><span class="report-cover-eyebrow">PACIENTE</span><h2>${u.esc(clinicalName)}</h2><p class="report-cover-summary">${u.esc(c.title)} · ${u.esc(c.identity.service||'Servicio no registrado')}</p><div class="report-header-details"><span>${u.svg('folder')} Expediente EXP-${u.esc(c.id)}</span><span>${u.svg('clock')} ${u.esc(c.identity.date||'Fecha no registrada')}</span><span>${u.svg('file-text')} Síntesis documental</span></div></header>`+
+ u.$('#reportDocument').innerHTML=reportHeader+`<header class="report-cover report-cover-clinical report-patient-cover"><div class="overline">ASSIST · XRAIC / EXPEDIENTE CLÍNICO INTEGRADO</div><span class="report-cover-eyebrow">PACIENTE</span><h2>${u.esc(clinicalName)}</h2><p class="report-cover-summary">${u.esc(c.title)} · ${u.esc(c.identity.service||'Servicio no registrado')}</p><div class="report-header-details"><span>${u.svg('folder')} Expediente EXP-${u.esc(c.id)}</span><span>${u.svg('clock')} ${u.esc(c.identity.date||'Fecha no registrada')}</span><span>${u.svg('file-text')} Síntesis documental</span></div></header>`+
  names.map(([key,label,title],i)=>`<section class="report-section report-story-section" id="r-${key}"><div class="report-story-heading"><span class="report-story-index">${String(i+1).padStart(2,'0')}</span><h2>${u.esc(title)}</h2></div><div class="report-story-content">${body[key]}${key==='alcance'?'':`<div class="report-story-reference"><a class="report-source-link" href="#r-alcance">Ver documentos de origen</a></div>`}</div></section>`).join('');
  // Sincroniza el control y la ficha en cada renderizado. Impide que el navegador
  // restaure otro valor visualmente distinto al expediente mostrado.
@@ -195,11 +161,10 @@ function renderSynthetic(c){
   const next=syntheticCases().find(x=>x.id===e.target.value);
   if(!next || (selectedSyntheticCase&&selectedSyntheticCase.id===next.id))return;
   renderSynthetic(next);
-  u.$('.report-quick-compare')?.scrollIntoView({behavior:'smooth',block:'start'});
+  u.$('#r-ingresos')?.scrollIntoView({behavior:'smooth',block:'start'});
  };
  caseSelect.addEventListener('change',selectCase);
  caseSelect.addEventListener('input',selectCase);
- bindQuickFilter(c);
  const back=u.$('#reportReturnRecord');if(back)back.addEventListener('click',()=>{selectedSyntheticCase=null;try{sessionStorage.removeItem(selectedCaseStorageKey)}catch(_){}render()});
  const source=u.$('#showOriginalSource');if(source)source.addEventListener('click',()=>{const box=u.$('#originalSourceText');const opening=box.classList.contains('hidden');box.classList.toggle('hidden');source.textContent=opening?'Ocultar fuente completa':'Ver fuente completa';source.setAttribute('aria-expanded',String(opening))});
 }
