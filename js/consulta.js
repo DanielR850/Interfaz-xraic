@@ -100,7 +100,7 @@ function openSyntheticChat(id){
  u.$('#chatContext').textContent='EXP-'+c.id+' · '+(c.identity.name||'Sin nombre');
  u.$('#composerStatus').textContent='Puedes seguir preguntando por este expediente';
  try{sessionStorage.setItem('xraic-prototype-selected-synthetic-case',c.id)}catch(_){}
- appendAI('<div class="chat-record-intro"><strong>Expediente EXP-'+u.esc(c.id)+' disponible</strong><p>'+u.esc(c.overview)+'</p><small>Comentario documental: '+u.esc(c.analysis)+'</small></div>'
+ appendAI('<div class="chat-record-intro"><strong>EXP-'+u.esc(c.id)+' · '+u.esc(c.identity.name||'Nombre no registrado')+'</strong><p>'+u.esc(c.overview)+'</p><small>Comentario documental: '+u.esc(c.analysis)+'</small></div>'
   +'<div class="answer-actions"><button type="button" class="btn secondary small" data-open-synthetic-report="'+u.esc(c.id)+'">'+u.svg('file-text')+' Ver expediente</button></div>',
   null,'Síntesis del expediente');
 }
