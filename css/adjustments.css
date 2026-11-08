@@ -309,3 +309,44 @@
 #page-historial .history-record-info>small { display:block;margin-top:9px;color:var(--muted);font-size:12px; }
 #page-historial .history-record-actions { display:flex;gap:9px;flex-wrap:wrap;align-items:center;flex-shrink:0; }
 @media(max-width:800px){#page-historial .history-record-actions{width:100%}}
+
+/* Eje visual único en Consulta, también a media anchura de ventana.
+   El ancho visible del título, separador, mensajes y compositor es idéntico. */
+#page-consulta {
+  width: 100%;
+  min-width: 0;
+}
+#page-consulta .consultation {
+  width: min(100%, 1200px);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+#page-consulta .consultation > .consultation-top,
+#page-consulta .consultation > .consultation-body,
+#page-consulta .consultation > .composer-shell {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+}
+#page-consulta .consultation > .consultation-body { flex: 1 0 auto; }
+#page-consulta .consultation-body > .empty-conversation,
+#page-consulta .consultation-body > .chat-wrap,
+#page-consulta .chat-wrap > .chat-messages,
+#page-consulta .composer-shell > .composer {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+#page-consulta .empty-conversation > p { max-width: 640px; }
+#page-historial .history-group-label { margin: 26px 0 11px; }
+#page-historial .history-group-label:first-child { margin-top: 0; }
+#page-historial .history-group-label h2 { font-size: 19px; margin: 0; }
+#page-historial .history-group-label p { color: var(--muted); font-size: 13px; margin: 2px 0 0; }
+#page-historial .history-record-actions button { white-space: nowrap; }
