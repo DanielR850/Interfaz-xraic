@@ -191,6 +191,14 @@ function render(){
 }
 // Abre directamente el expediente consultado desde Historial, sin reutilizar
 // el paciente sintético que estuviera seleccionado en otra sesión.
+// Acceso directo desde Historial a uno de los siete reportes ficticios.
+window.XRAIC_OPEN_SYNTHETIC_REPORT=function(id){
+ const c=syntheticCases().find(x=>x.id===String(id));
+ if(!c)return;
+ selectedSyntheticCase=c;
+ try{sessionStorage.setItem(selectedCaseStorageKey,c.id)}catch(_){}
+ U().showPage('reporte');
+};
 window.XRAIC_OPEN_RECORD_REPORT=function(record){
  if(!record)return;
  selectedSyntheticCase=null;
