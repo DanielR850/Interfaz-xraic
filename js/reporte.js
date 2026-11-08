@@ -189,6 +189,16 @@ function render(){
  names.map(([key,label,title],i)=>`<section class="report-section report-story-section" id="r-${key}"><div class="report-story-heading"><span class="report-story-index">${String(i+1).padStart(2,'0')}</span><h2>${u.esc(title)}</h2></div><div class="report-story-content">${body[key]}${key!=='alcance'?`<div class="report-story-reference">${sourceButton([key==='ingresos'?'NotaIngreso_HC':key==='historia'?'historiaclinica':key==='exploracion'?'SignosVitales':key==='evolucion'?'NotasEvolucion':key==='indicaciones'?'Indicaciones':key==='egreso'?'notaegreso':'NotaMedicaUrg'],!showcase)}</div>`:''}</div></section>`).join('');
  const source=u.$('#showOriginalSource');if(source)source.addEventListener('click',()=>{const box=u.$('#originalSourceText');const opening=box.classList.contains('hidden');box.classList.toggle('hidden');source.textContent=opening?'Ocultar nota completa':'Ver nota completa';source.setAttribute('aria-expanded',String(opening))});
 }
+// Abre directamente el expediente consultado desde Historial, sin reutilizar
+// el paciente sintético que estuviera seleccionado en otra sesión.
+window.XRAIC_OPEN_RECORD_REPORT=function(record){
+ if(!record)return;
+ selectedSyntheticCase=null;
+ try{sessionStorage.removeItem(selectedCaseStorageKey)}catch(_){}
+ const u=U();
+ u.state.record=record;
+ u.showPage('reporte');
+};
 window.XRAIC_INIT_REPORTE=function(){const u=U();u.renderReport=render;u.$('#reportToc').addEventListener('click',e=>{const a=e.target.closest('[data-anchor]');if(!a)return;e.preventDefault();const el=document.getElementById(a.dataset.anchor);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});u.$$('#reportToc a').forEach(x=>x.classList.toggle('active',x===a))}});
 window.addEventListener('scroll',()=>{if(u.state.page!=='reporte')return;const active=u.$$('#reportDocument .report-section').filter(s=>s.getBoundingClientRect().top<190).pop();if(active)u.$$('#reportToc a').forEach(a=>a.classList.toggle('active',a.dataset.anchor===active.id))},{passive:true});};
 })();
