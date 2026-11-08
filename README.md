@@ -19,3 +19,4 @@ Ir a **Settings → Pages**, elegir **Deploy from a branch**, rama **main** y ca
 La dirección prevista es `https://danielr850.github.io/Interfaz-xraic/`, pero solo funcionará cuando GitHub Pages esté activado y la publicación concluya.
 
 El repositorio original de la aplicación clínica permanece privado y separado.
+Interfaz en desarrollo
