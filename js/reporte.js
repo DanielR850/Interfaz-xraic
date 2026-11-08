@@ -5,7 +5,13 @@
 'use strict';
 const U=()=>window.XUI;
 const syntheticCases=()=>window.XRAIC_REPORT_CASES||[];
+// El selector y el contenido clínico deben usar la misma fuente de verdad.
+const selectedCaseStorageKey='xraic-prototype-selected-synthetic-case';
 let selectedSyntheticCase=null;
+try {
+ const savedId=sessionStorage.getItem(selectedCaseStorageKey);
+ selectedSyntheticCase=syntheticCases().find(c=>c.id===savedId)||null;
+} catch (_) { /* El prototipo funciona aunque el navegador bloquee storage. */ }
 const demo={
   id:'R-SIM',title:'Atención en urgencias · palpitaciones',patientName:'Javier Alejandro Serrano',
   profile:{age:'54 años',sex:'Masculino',service:'Urgencias',date:'18 sep 2026',episode:'Atención única',source:'Nota de urgencias · URG-SIM-018'},
@@ -170,23 +176,31 @@ function bindQuickFilter(c){
 }
 function renderSynthetic(c){
  if(!c)return;
+ selectedSyntheticCase=c;
+ try { sessionStorage.setItem(selectedCaseStorageKey,c.id); } catch (_) {}
  const u=U(),record=u.state.record,emptyEl=u.$('#reportEmpty'),content=u.$('#reportContent');
  emptyEl.classList.add('hidden');content.classList.remove('hidden');
  const body=composeSynthetic(c);
  const options=syntheticCases().map(x=>`<option value="${u.esc(x.id)}" ${c.id===x.id?'selected':''}>${u.esc(x.id)} · ${u.esc(x.identity.name||'Sin nombre')} · ${u.esc(x.state)}</option>`).join('');
  const clinicalName=c.identity.name||'Nombre no registrado';
- const reportHeader=`<div class="report-scenario-bar"><label for="reportCaseSelect">Expediente</label><select id="reportCaseSelect">${options}</select><span class="report-scenario-tag">${u.esc(c.state)}</span>${record?'<button type="button" class="btn ghost small" id="reportReturnRecord">Volver al expediente consultado</button>':''}</div>`;
+ const reportHeader=`<div class="report-scenario-bar"><label for="reportCaseSelect">Expediente</label><select id="reportCaseSelect" autocomplete="off" aria-label="Elegir expediente ficticio">${options}</select><span class="report-scenario-tag">${u.esc(c.state)}</span>${record?'<button type="button" class="btn ghost small" id="reportReturnRecord">Volver al expediente consultado</button>':''}</div>`;
  u.$('#reportToc').innerHTML=names.map(([key,label],i)=>`<a href="#r-${key}" data-anchor="r-${key}" class="${i===0?'active':''}">${String(i+1).padStart(2,'0')} · ${u.esc(label)}</a>`).join('');
  u.$('#reportDocument').innerHTML=reportHeader+renderQuickFields(c)+`<header class="report-cover report-cover-clinical report-patient-cover"><div class="overline">ASSIST · XRAIC / EXPEDIENTE CLÍNICO INTEGRADO</div><span class="report-cover-eyebrow">PACIENTE</span><h2>${u.esc(clinicalName)}</h2><p class="report-cover-summary">${u.esc(c.title)} · ${u.esc(c.identity.service||'Servicio no registrado')}</p><div class="report-header-details"><span>${u.svg('folder')} Expediente EXP-${u.esc(c.id)}</span><span>${u.svg('clock')} ${u.esc(c.identity.date||'Fecha no registrada')}</span><span>${u.svg('file-text')} Síntesis documental</span></div></header>`+
  names.map(([key,label,title],i)=>`<section class="report-section report-story-section" id="r-${key}"><div class="report-story-heading"><span class="report-story-index">${String(i+1).padStart(2,'0')}</span><h2>${u.esc(title)}</h2></div><div class="report-story-content">${body[key]}${key==='alcance'?'':`<div class="report-story-reference"><a class="report-source-link" href="#r-alcance">Ver documentos de origen</a></div>`}</div></section>`).join('');
- u.$('#reportCaseSelect').addEventListener('change',e=>{
-  selectedSyntheticCase=syntheticCases().find(x=>x.id===e.target.value);
-  if(!selectedSyntheticCase)return;
-  renderSynthetic(selectedSyntheticCase);
+ // Sincroniza el control y la ficha en cada renderizado. Impide que el navegador
+ // restaure otro valor visualmente distinto al expediente mostrado.
+ const caseSelect=u.$('#reportCaseSelect');
+ caseSelect.value=c.id;
+ const selectCase=e=>{
+  const next=syntheticCases().find(x=>x.id===e.target.value);
+  if(!next || (selectedSyntheticCase&&selectedSyntheticCase.id===next.id))return;
+  renderSynthetic(next);
   u.$('.report-quick-compare')?.scrollIntoView({behavior:'smooth',block:'start'});
- });
+ };
+ caseSelect.addEventListener('change',selectCase);
+ caseSelect.addEventListener('input',selectCase);
  bindQuickFilter(c);
- const back=u.$('#reportReturnRecord');if(back)back.addEventListener('click',()=>{selectedSyntheticCase=null;render()});
+ const back=u.$('#reportReturnRecord');if(back)back.addEventListener('click',()=>{selectedSyntheticCase=null;try{sessionStorage.removeItem(selectedCaseStorageKey)}catch(_){}render()});
  const source=u.$('#showOriginalSource');if(source)source.addEventListener('click',()=>{const box=u.$('#originalSourceText');const opening=box.classList.contains('hidden');box.classList.toggle('hidden');source.textContent=opening?'Ocultar fuente completa':'Ver fuente completa';source.setAttribute('aria-expanded',String(opening))});
 }
 
