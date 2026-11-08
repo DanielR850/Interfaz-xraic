@@ -1,0 +1,160 @@
+/* Complementos V6. No cambia el sistema de colores, familias, navegación ni componentes base de V3. */
+.empty-conversation{max-width:940px;margin:auto}
+.empty-conversation p{max-width:650px}
+.welcome-prompts{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:20px auto}
+.quick-prompt{border:1px solid var(--border);background:var(--paper);color:var(--brand);font-size:13px;padding:10px 13px;border-radius:999px;font-weight:600;cursor:pointer}
+.quick-prompt:hover{background:var(--soft);border-color:var(--brand)}
+.match-options{display:grid;gap:9px;margin:14px 0}
+.match-option{text-align:left;width:100%;padding:13px;background:var(--paper2);border:1px solid var(--border);border-radius:8px;color:var(--ink);cursor:pointer}
+.match-option strong,.match-option small{display:block}.match-option small{margin-top:3px;color:var(--muted)}
+.ai-response .answer-lead{font-size:16px;line-height:1.72}
+.answer-list{padding-left:21px;margin:12px 0}.answer-list li{margin:10px 0;line-height:1.6}
+.answer-caveat{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padding-top:10px;margin-top:13px!important}
+.answer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.clinical-inline{border-left:3px solid var(--brand);background:var(--paper2);padding:12px 15px;margin:13px 0;border-radius:6px}
+.clinical-inline.caution{border-left-color:var(--warn)}.clinical-inline strong{font-size:14px}
+.report-disclaimer{font-size:12px;color:var(--muted);margin:16px 0 0!important}
+.report-lead{font-size:17px;line-height:1.74!important;margin:0 0 18px!important}
+.report-focus{background:var(--soft);border-left:3px solid var(--brand);border-radius:8px;padding:15px 17px;margin-top:14px}
+.report-focus strong{display:block;margin-bottom:4px}
+.report-number{font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--brand);margin-bottom:7px}
+.report-section-body p{font-size:15px;line-height:1.75;margin:10px 0}
+.report-paragraph-list p{padding:0 0 10px 18px;position:relative;border-bottom:1px solid var(--border)}
+.report-paragraph-list p:before{content:'•';position:absolute;left:2px;color:var(--brand)}
+.report-source-foot{border-top:1px solid var(--border);padding-top:10px;margin-top:14px}
+.verification-notes{border-left:3px solid var(--warn);padding-left:14px}
+.report-data-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.report-data-fields>div{background:var(--paper2);border:1px solid var(--border);border-radius:9px;padding:12px}
+.report-data-fields span{display:block;font-size:12px;color:var(--muted)}
+.report-data-fields strong{display:block;margin-top:3px;font-size:14px;overflow-wrap:anywhere}
+.report-references{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+.report-reference{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px}
+.report-reference .icon{flex-shrink:0;color:var(--brand)}
+.episode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.episode-brief{border:1px solid var(--border);background:var(--paper2);border-radius:9px;padding:12px}
+.episode-brief p{font-size:13px;margin:4px 0 0}
+.report-section{scroll-margin-top:105px}
+@media(min-width:1200px){.consultation{max-width:1300px}.consultation-top,.consultation-body{max-width:1200px}.composer{max-width:1200px}.chat-messages{max-width:1200px}}
+@media(max-width:700px){.report-data-fields,.report-references,.episode-grid{grid-template-columns:1fr}.answer-actions{flex-direction:column}.answer-actions .btn{width:100%;justify-content:center}}
+@media print{.report-source-foot{display:none!important}.report-focus{border-color:#666}.report-section{break-inside:auto}}
+
+/* V7: elementos narrativos del documento sin alterar los tamaños, colores ni distribución de V3. */
+.report-clinical-note{background:var(--paper2);border-left:3px solid var(--brand);border-radius:7px;padding:13px 16px;margin:12px 0}
+.report-clinical-note p{margin:0!important}
+.report-source-context{color:var(--muted);font-size:12px;margin-top:8px}
+.report-section .source-explanation{border-top:1px solid var(--border);padding-top:8px;margin-top:10px;font-size:12px;color:var(--muted)}
+.report-episode-note{margin:12px 0 17px;border-left:2px solid var(--border);padding:0 0 0 16px}
+.report-episode-note strong{display:block;color:var(--ink);font-size:14px}
+.report-episode-note span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.report-missing{color:var(--muted);font-size:14px;border-left:2px solid var(--border);padding-left:13px}
+
+/* Reporte narrativo: SOLO vista Reporte; conserva paleta, tipografía y navegación V3. */
+.report-cover-clinical{padding-bottom:23px;margin-bottom:22px}
+.report-cover-clinical h2{font-size:29px;margin:8px 0 2px;letter-spacing:-.025em}
+.report-cover-summary{font-size:15px;color:var(--muted)!important;margin:0 0 16px!important}
+.report-header-details{display:flex;flex-wrap:wrap;align-items:center;gap:15px;color:var(--muted);font-size:12px}
+.report-header-details span{display:inline-flex;align-items:center;gap:6px}
+.report-header-details svg{width:15px;height:15px;color:var(--brand)}
+.report-story-section{padding:21px 0 30px;margin-bottom:0}
+.report-story-heading{display:flex;gap:13px;align-items:baseline;margin-bottom:17px}
+.report-story-heading h2{display:block!important;margin:0!important;font-size:20px;letter-spacing:-.02em;color:var(--ink)}
+.report-story-index{color:var(--brand);font-size:12px;font-weight:700;letter-spacing:.14em;min-width:24px}
+.report-story-content{padding-left:37px;max-width:880px}
+.report-story-content p{line-height:1.76;margin:0 0 12px;font-size:15px}
+.report-overview p:first-child{font-size:16px;line-height:1.8}
+.report-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0 4px}
+.report-fact{background:var(--paper2);border:1px solid var(--border);border-radius:9px;padding:12px;min-width:0}
+.report-fact span,.report-person-grid span{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.report-fact strong{display:block;font-size:15px;overflow-wrap:anywhere}
+.report-person-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:22px;row-gap:0;margin:2px 0 8px}
+.report-person-grid>div{padding:10px 0;border-bottom:1px solid var(--border)}
+.report-person-grid strong{display:block;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+.report-quiet{font-size:14px!important;color:var(--muted);border-left:2px solid var(--border);padding-left:13px}
+.report-document-lines{display:grid;gap:9px}
+.report-document-lines p{margin:0!important;padding-left:14px;border-left:2px solid var(--border)}
+.report-story-reference{margin-top:15px}
+.report-source-link{font-size:12px;font-weight:700;color:var(--brand);text-decoration:underline;text-underline-offset:3px}
+.report-small-context{font-size:12px!important;color:var(--muted);margin-top:13px!important}
+.report-narrative-timeline{border-left:2px solid var(--border);padding-left:19px;margin:8px 0 0 7px}
+.report-narrative-event{position:relative;padding:0 0 18px}
+.report-narrative-event:before{content:'';position:absolute;left:-26px;top:5px;width:10px;height:10px;background:var(--brand);border-radius:50%;border:2px solid var(--paper)}
+.report-narrative-event span{display:block;font-size:12px;font-weight:700;color:var(--brand)}
+.report-narrative-event p{margin:4px 0 0!important}
+.report-original-reference{border:1px solid var(--border);background:var(--paper2);border-radius:9px;padding:13px;display:flex;gap:12px;justify-content:space-between;align-items:center}
+.report-original-reference strong{display:block;font-size:14px}
+.report-original-reference small{display:block;color:var(--muted);margin-top:3px;font-size:12px}
+.report-original-full{background:var(--paper2);border:1px solid var(--border);border-top:0;border-radius:0 0 9px 9px;padding:18px;line-height:1.7}
+.report-story-content h3{font-size:15px;margin:19px 0 10px}
+.report-ref-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.report-ref-grid>div{border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px;font-size:13px}
+.report-ref-grid .icon{color:var(--brand);width:16px;height:16px;flex-shrink:0}
+.report-narrative-highlight{margin:12px 0;padding:12px 14px;border-left:3px solid var(--brand);background:var(--paper2);border-radius:7px}
+.report-narrative-highlight strong{display:block;font-size:13px;margin-bottom:4px}
+.report-episode-line{margin-top:8px!important;font-size:13px!important}
+@media(max-width:780px){.report-story-content{padding-left:0}.report-facts{grid-template-columns:1fr}.report-person-grid{grid-template-columns:1fr}.report-original-reference{align-items:start;flex-direction:column}.report-ref-grid{grid-template-columns:1fr}}
+@media print{.report-story-reference,.report-original-reference button{display:none!important}.report-original-full.hidden{display:none}.report-story-section{break-inside:auto!important}.report-story-content{padding-left:0}.report-document{border:none!important;box-shadow:none!important}}
+
+/* V8 · Jerarquía documental de identificación — solo Reporte. */
+.report-patient-cover{border-bottom:1px solid var(--border);padding-bottom:22px}
+.report-cover-eyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--brand);margin:17px 0 2px}
+.report-patient-cover h2{font-size:clamp(27px,3vw,38px);line-height:1.15;letter-spacing:-.025em;margin:3px 0 6px}
+.report-patient-identification{border-top:2px solid var(--brand);border-bottom:1px solid var(--border);padding:17px 0 4px;margin:8px 0 12px}
+.report-patient-primary{padding:3px 0 20px;border-bottom:1px solid var(--border)}
+.report-patient-primary span,.report-patient-secondary span{display:block;font-size:11px;letter-spacing:.08em;font-weight:700;color:var(--muted);text-transform:uppercase}
+.report-patient-primary strong{display:block;font-size:clamp(22px,2.6vw,31px);font-weight:700;line-height:1.3;letter-spacing:-.02em;margin:5px 0 2px;overflow-wrap:anywhere}
+.report-patient-primary small{display:block;color:var(--muted);font-size:12px}
+.report-patient-secondary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:20px;row-gap:0}
+.report-patient-secondary>div{padding:15px 0;border-bottom:1px solid var(--border)}
+.report-patient-secondary strong{display:block;font-size:15px;font-weight:600;margin-top:4px;overflow-wrap:anywhere}
+.report-analysis-note{background:var(--paper2);border-left:4px solid var(--brand);border-radius:0 9px 9px 0;padding:16px 18px;margin:20px 0}
+.report-analysis-title{font-size:13px;font-weight:700;color:var(--brand);margin-bottom:8px}
+.report-analysis-note p{font-size:14px!important;line-height:1.72!important;margin:0!important}
+@media(max-width:760px){.report-patient-secondary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.report-patient-secondary{grid-template-columns:1fr}}
+@media print{.report-patient-cover h2{font-size:26px}.report-patient-secondary{grid-template-columns:repeat(3,minmax(0,1fr))}.report-analysis-note{break-inside:avoid}}
+
+/* Estados del expediente (completo, sin registro, contradictorio). Solo Reporte. */
+.report-scenario-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--paper2);margin-bottom:22px}
+.report-scenario-bar label{font-size:13px;font-weight:700;color:var(--muted)}
+.report-scenario-bar select{flex:1;min-width:220px;max-width:460px;padding:10px 32px 10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.report-scenario-tag{display:inline-block;font-size:12px;font-weight:700;color:var(--brand);border:1px solid var(--border);padding:8px 10px;border-radius:999px;background:var(--paper)}
+.report-scenario-bar select:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.report-identity-item.is-missing strong{font-weight:500;color:var(--muted)}
+.report-identity-item.is-missing{background:transparent}
+.report-data-missing{font-weight:500;font-style:normal;color:var(--muted);font-size:13px;letter-spacing:normal;text-transform:none}
+.report-identity-item.is-conflicted{border-left:3px solid var(--warn);padding-left:10px}
+.report-field-conflicts{display:grid;gap:3px;font-size:13px;font-weight:600}
+.report-field-conflicts span{font-size:11px!important;color:var(--warn)!important;text-transform:none!important;font-weight:600!important;letter-spacing:normal!important;margin:5px 0 0!important}
+.report-patient-primary .report-name-missing{font-size:clamp(20px,2.4vw,28px);color:var(--muted)}
+.report-identity-panel{grid-template-columns:repeat(3,minmax(0,1fr))}
+.report-identity-panel>div{min-width:0}
+.report-identity-panel strong{line-height:1.4}
+@media(max-width:760px){.report-identity-panel{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.report-identity-panel{grid-template-columns:1fr}.report-scenario-bar select{min-width:100%}}
+@media print{.report-scenario-bar{display:none!important}.report-identity-panel{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Comparación reactiva de valores registrados, ausentes y contradictorios. Solo Reporte. */
+.report-quick-compare{border:1px solid var(--border);border-radius:12px;background:var(--paper2);padding:20px;margin:0 0 22px;scroll-margin-top:110px}
+.report-quick-heading{display:flex;align-items:start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.report-quick-heading h3{font-size:18px;margin:0 0 4px;color:var(--ink)}
+.report-quick-heading p{margin:0;color:var(--muted);font-size:13px}
+.report-quick-counts{display:flex;gap:8px;flex-wrap:wrap}
+.report-quick-counts span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:8px;color:var(--ink);background:var(--paper);border:1px solid var(--border)}
+.report-quick-controls{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 14px}
+.quick-filter{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--muted);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.quick-filter:hover{border-color:var(--brand);color:var(--brand)}
+.quick-filter.active{background:var(--brand);color:white;border-color:var(--brand)}
+.quick-filter:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.report-quick-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.report-quick-item{padding:12px;border:1px solid var(--border);border-radius:9px;background:var(--paper);min-width:0}
+.report-quick-item .quick-label{font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);display:block}
+.report-quick-item strong{font-weight:700;font-size:15px;display:block;margin:6px 0;overflow-wrap:anywhere;line-height:1.35;color:var(--ink)}
+.report-quick-item small{color:var(--muted);font-size:11px}
+.report-quick-item.status-missing{border-style:dashed;background:var(--paper2)}
+.report-quick-item.status-missing strong{color:var(--muted);font-style:italic;font-weight:500}
+.report-quick-item.status-conflict{border-left:4px solid var(--warn)}
+.report-quick-item.status-conflict strong{color:var(--ink)}
+.report-quick-complete{color:var(--muted);margin:0;padding:12px}
+@media(max-width:900px){.report-quick-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.report-quick-fields{grid-template-columns:1fr}.report-quick-compare{padding:14px}}
+@media print{.report-quick-compare{display:none!important}}
