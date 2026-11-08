@@ -176,7 +176,12 @@ window.XRAIC_REPORT_CASES=[
         ]
       },
       "allergies": null,
-      "blood": "A positivo",
+      "blood": {
+        "duplicate": [
+          "A positivo · historia clínica ficticia",
+          "A positivo · nota de ingreso ficticia"
+        ]
+      },
       "service": "Urgencias / Hospitalización",
       "date": "02 feb–20 ago 2026"
     },
