@@ -271,3 +271,41 @@
 @media(max-width:1100px){#page-analitica .analytics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#page-analitica .analytics-two-columns{grid-template-columns:1fr}}
 @media(max-width:540px){#page-analitica .analytics-filters{padding:13px}#page-analitica .analytics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#page-analitica .analytics-panel{padding:15px}#page-analitica .analytics-quality{grid-template-columns:repeat(2,minmax(0,1fr))}#page-analitica .analytics-patient .btn{width:100%}}
 @media print{#page-analitica .analytics-filters,#page-analitica .analytics-trend-actions button,#page-analitica .analytics-patient button{display:none!important}}
+
+/* Consulta: mismo eje central para título, línea divisoria, conversación y entrada. */
+#page-consulta .consultation {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+#page-consulta .consultation-top,
+#page-consulta .consultation-body,
+#page-consulta .chat-wrap,
+#page-consulta .composer-shell {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: auto;
+}
+#page-consulta .chat-messages,
+#page-consulta .composer {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+}
+#page-consulta .chat-record-intro {
+  border-left: 3px solid var(--brand);
+  background: var(--paper2);
+  border-radius: 0 8px 8px 0;
+  padding: 13px 16px;
+  margin-bottom: 8px;
+}
+#page-consulta .chat-record-intro strong { display:block;margin-bottom:7px; }
+#page-consulta .chat-record-intro p { margin:0 0 7px;line-height:1.62; }
+#page-consulta .chat-record-intro small { color:var(--muted);font-size:12px; }
+#page-historial .history-record-card { align-items:flex-start; }
+#page-historial .history-record-info { flex:1;min-width:0; }
+#page-historial .history-record-description { max-width:850px;line-height:1.55; }
+#page-historial .history-record-info>small { display:block;margin-top:9px;color:var(--muted);font-size:12px; }
+#page-historial .history-record-actions { display:flex;gap:9px;flex-wrap:wrap;align-items:center;flex-shrink:0; }
+@media(max-width:800px){#page-historial .history-record-actions{width:100%}}
