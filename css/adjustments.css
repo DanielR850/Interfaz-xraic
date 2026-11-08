@@ -133,28 +133,16 @@
 @media(max-width:500px){.report-identity-panel{grid-template-columns:1fr}.report-scenario-bar select{min-width:100%}}
 @media print{.report-scenario-bar{display:none!important}.report-identity-panel{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-/* Comparación reactiva de valores registrados, ausentes y contradictorios. Solo Reporte. */
-.report-quick-compare{border:1px solid var(--border);border-radius:12px;background:var(--paper2);padding:20px;margin:0 0 22px;scroll-margin-top:110px}
-.report-quick-heading{display:flex;align-items:start;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.report-quick-heading h3{font-size:18px;margin:0 0 4px;color:var(--ink)}
-.report-quick-heading p{margin:0;color:var(--muted);font-size:13px}
-.report-quick-counts{display:flex;gap:8px;flex-wrap:wrap}
-.report-quick-counts span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:8px;color:var(--ink);background:var(--paper);border:1px solid var(--border)}
-.report-quick-controls{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 14px}
-.quick-filter{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--muted);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
-.quick-filter:hover{border-color:var(--brand);color:var(--brand)}
-.quick-filter.active{background:var(--brand);color:white;border-color:var(--brand)}
-.quick-filter:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
-.report-quick-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.report-quick-item{padding:12px;border:1px solid var(--border);border-radius:9px;background:var(--paper);min-width:0}
-.report-quick-item .quick-label{font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);display:block}
-.report-quick-item strong{font-weight:700;font-size:15px;display:block;margin:6px 0;overflow-wrap:anywhere;line-height:1.35;color:var(--ink)}
-.report-quick-item small{color:var(--muted);font-size:11px}
-.report-quick-item.status-missing{border-style:dashed;background:var(--paper2)}
-.report-quick-item.status-missing strong{color:var(--muted);font-style:italic;font-weight:500}
-.report-quick-item.status-conflict{border-left:4px solid var(--warn)}
-.report-quick-item.status-conflict strong{color:var(--ink)}
-.report-quick-complete{color:var(--muted);margin:0;padding:12px}
-@media(max-width:900px){.report-quick-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:540px){.report-quick-fields{grid-template-columns:1fr}.report-quick-compare{padding:14px}}
-@media print{.report-quick-compare{display:none!important}}
+
+/* Un único bloque de identificación dentro del expediente clínico.
+   Estados por campo: registrado, ausente, discordante y duplicado. */
+.report-identity-intro p{margin:0 0 9px;color:var(--muted);font-size:13px;line-height:1.55}
+.report-identity-item .report-field-state{display:inline-block;margin-top:5px;font-size:11px;letter-spacing:0;text-transform:none;font-weight:600;color:var(--muted)}
+.report-identity-item.is-missing .report-field-state{color:var(--muted)}
+.report-identity-item.is-missing strong{font-weight:500;color:var(--muted)}
+.report-identity-item.is-conflicted .report-field-state{color:var(--warn)}
+.report-identity-item.is-conflicted{border-left:3px solid var(--warn);padding-left:12px}
+.report-identity-item.is-duplicated{border-left:3px solid var(--brand);padding-left:12px}
+.report-identity-item.is-duplicated .report-field-state{color:var(--brand)}
+.report-field-duplicates{display:grid;gap:3px;font-size:13px;font-weight:600}
+.report-field-duplicates>div{overflow-wrap:anywhere}
