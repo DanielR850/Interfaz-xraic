@@ -146,3 +146,21 @@
 .report-identity-item.is-duplicated .report-field-state{color:var(--brand)}
 .report-field-duplicates{display:grid;gap:3px;font-size:13px;font-weight:600}
 .report-field-duplicates>div{overflow-wrap:anywhere}
+
+/* Índice de Reporte: permanece visible al recorrer el documento (escritorio). */
+@media (min-width:781px) {
+  #page-reporte .report-index {
+    position: sticky;
+    top: 88px;
+    align-self: start;
+    min-height: 0;
+    max-height: calc(100vh - 104px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #page-reporte .report-index .sticky-index {
+    position: static;
+    top: auto;
+  }
+}
