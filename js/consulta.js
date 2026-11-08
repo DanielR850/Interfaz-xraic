@@ -54,21 +54,86 @@ function showRecordIntro(rec){
  const episodeCount=Array.isArray(rec.episodes)?rec.episodes.length:0;
  appendAI('<div class="chat-record-intro"><strong>Expediente '+u.esc(rec.id)+' localizado</strong><p>'+u.esc(summary)+'</p><small>'+episodeCount+' ingreso(s) identificado(s) · Síntesis documental, no una valoración médica nueva.</small></div>'+sourceButton(rec,[]),rec,'Expediente disponible');
 }
+
+/* Conversación de evaluación vinculada a los expedientes ficticios 0001–0007.
+   Respuestas descriptivas: nunca se inventan hallazgos clínicos. */
+function syntheticCases(){return window.XRAIC_REPORT_CASES||[]}
+function saveSyntheticHistory(c,question,topic){
+ const u=U();
+ u.state.history.unshift({record:'EXP-'+c.id,question,summary:topic,date:new Date().toISOString()});
+ u.state.history=u.state.history.slice(0,80);
+ try{localStorage.setItem('xraic-v6-history',JSON.stringify(u.state.history))}catch(_){}
+}
+function syntheticAnswer(c,question){
+ const u=U(),q=u.normalize(question),parts=[];
+ let topic='Información del expediente';
+ if(/antecedent|alergia|historia/.test(q)){
+  topic='Antecedentes documentados';parts.push(...(c.history||[]));
+ }else if(/signo|peso|talla|temperatura|presion|medici|explorac/.test(q)){
+  topic='Mediciones y exploración';parts.push(...(c.exploration||[]));
+  if(!parts.length)parts.push('No se encuentran mediciones clínicas suficientes para responder con valores.');
+ }else if(/tratam|recet|medicam|indicac|dosis/.test(q)){
+  topic='Indicaciones registradas';parts.push(...(c.orders||[]));
+  if(!parts.length)parts.push('No se documentaron indicaciones verificables en este caso.');
+ }else if(/cronolog|evoluci|ingreso|egreso|cirug|operacion|fecha|ocurrio/.test(q)){
+  topic='Evolución documental';parts.push(...(c.events||[]));
+  if(!parts.length)parts.push('No hay acontecimientos clínicos fechados para construir una evolución.');
+ }else if(/fuente|origen|documento|registro/.test(q)){
+  topic='Fuentes disponibles';parts.push(...(c.sources||[]));
+ }else{
+  topic='Resumen del expediente';parts.push(c.overview);
+ }
+ const content=parts.length?'<ul class="answer-list">'+parts.map(x=>'<li>'+u.esc(x)+'</li>').join('')+'</ul>':
+  '<p>No se dispone de información documentada para ese apartado.</p>';
+ return {topic,html:content+'<p class="answer-caveat">'+u.esc(c.analysis)+' · Caso ficticio: no sustituye la lectura del documento original.</p>'};
+}
+function openSyntheticChat(id){
+ const u=U(),c=syntheticCases().find(x=>x.id===String(id));
+ if(!c)return;
+ u.state.record=null;u.state.syntheticCase=c;u.state.turns=[];
+ u.$('#emptyConversation').classList.add('hidden');
+ u.$('#chatWrap').classList.remove('hidden');
+ u.$('#chatMessages').innerHTML='';
+ u.$('#activeRecordLabel').textContent='EXP-'+c.id+' · '+(c.identity.name||'Sin nombre');
+ u.$('#caseHint').textContent='Expediente ficticio activo';
+ u.$('#caseDropdown').classList.add('hidden');
+ u.$('#chatContext').textContent='EXP-'+c.id+' · '+(c.identity.name||'Sin nombre');
+ u.$('#composerStatus').textContent='Puedes seguir preguntando por este expediente';
+ try{sessionStorage.setItem('xraic-prototype-selected-synthetic-case',c.id)}catch(_){}
+ appendAI('<div class="chat-record-intro"><strong>Expediente EXP-'+u.esc(c.id)+' disponible</strong><p>'+u.esc(c.overview)+'</p><small>Comentario documental: '+u.esc(c.analysis)+'</small></div>'
+  +'<div class="answer-actions"><button type="button" class="btn secondary small" data-open-synthetic-report="'+u.esc(c.id)+'">'+u.svg('file-text')+' Ver expediente</button></div>',
+  null,'Síntesis del expediente');
+}
+
 let pendingQuestion="";
 function renderMatched(matches,q){pendingQuestion=q;let u=U();u.$('#emptyConversation').classList.add('hidden');u.$('#chatWrap').classList.remove('hidden');appendAI(`<p>Encontré varias personas o expedientes que podrían coincidir. Para evitar mezclar información clínica, selecciona el caso correcto:</p><div class="match-options">${matches.map(r=>`<button type="button" class="match-option" data-match="${u.esc(r.id)}"><strong>${u.esc(r.title)}</strong><small>${u.esc(u.detail[r.id]?.reason||'Expediente documental')}</small></button>`).join('')}</div>`,null,'Coincidencias de búsqueda');}
 function saveHistory(question,rec,answer){let u=U();u.state.history.unshift({question,record:rec.id,summary:answer.topic,date:new Date().toISOString()});u.state.history=u.state.history.slice(0,60);try{localStorage.setItem('xraic-v6-history',JSON.stringify(u.state.history))}catch{}}
-function submit(question){let u=U();question=question.trim();if(!question)return;u.$('#chatInput').value='';if(!u.state.record){let matches=findRecord(question);u.$('#emptyConversation').classList.add('hidden');u.$('#chatWrap').classList.remove('hidden');appendUser(question);
+function submit(question){let u=U();question=question.trim();if(!question)return;u.$('#chatInput').value='';
+ const activeSynthetic=u.state.syntheticCase;
+ if(activeSynthetic){
+  appendUser(question);
+  const response=syntheticAnswer(activeSynthetic,question);
+  appendAI(response.html+'<div class="answer-actions"><button type="button" class="btn ghost small" data-open-synthetic-report="'+u.esc(activeSynthetic.id)+'">'+u.svg('file-text')+' Ver expediente completo</button></div>',null,response.topic);
+  saveSyntheticHistory(activeSynthetic,question,response.topic);
+  return;
+ }
+ if(!u.state.record){
+  const q=u.normalize(question);
+  const match=syntheticCases().find(c=>q.includes(c.id)&&/(?:expediente|paciente|caso|consulta|reporte|ver|mostrar|mu[eé]stra)/.test(q))
+   ||syntheticCases().find(c=>c.identity.name&&q.includes(u.normalize(c.identity.name)));
+  if(match){openSyntheticChat(match.id);appendUser(question);const response=syntheticAnswer(match,question);appendAI(response.html,null,response.topic);saveSyntheticHistory(match,question,response.topic);return;}
+ }if(!u.state.record){let matches=findRecord(question);u.$('#emptyConversation').classList.add('hidden');u.$('#chatWrap').classList.remove('hidden');appendUser(question);
  if(!matches.length){appendAI(`<p>No encontré una coincidencia suficientemente clara con esa descripción. Puedes incluir el motivo de atención, una fecha o buscar por clave sin escribir SQL.</p><button class="btn secondary small" type="button" data-open-chooser>Buscar por clave</button>`,null,'Búsqueda documental');return}
  if(matches.length>1){renderMatched(matches,question);return}
  u.choose(matches[0]);
  appendUser(question);
 }else appendUser(question);
 let rec=u.state.record,answer=answerFor(question,rec);if(!u.$('#chatMessages').querySelector('.message.ai'))showRecordIntro(rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);u.state.turns.push({question,topic:answer.topic,answer:answer.body});saveHistory(question,rec,answer);u.$('#composerStatus').textContent='Consultando '+rec.title+' · Puedes seguir preguntando';}
-function init(){let u=U();u.answer=submit;u.showRecordIntro=showRecordIntro;
+function init(){let u=U();u.answer=submit;u.showRecordIntro=showRecordIntro;u.openSyntheticChat=openSyntheticChat;
  u.$('#chatForm').onsubmit=e=>{e.preventDefault();submit(u.$('#chatInput').value)};
  u.$('#chatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit(u.$('#chatInput').value)}};
  u.$('#emptySelect')?.addEventListener('click',u.openChooser);
- document.addEventListener('click',e=>{let quick=e.target.closest('[data-quick]');if(quick)submit(quick.dataset.quick);let matched=e.target.closest('[data-match]');if(matched){let rec=u.records.find(r=>r.id===matched.dataset.match);if(rec){let text=pendingQuestion||('Muéstrame una síntesis clínica del expediente '+rec.id);u.choose(rec);appendUser(text);showRecordIntro(rec);let answer=answerFor(text,rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);saveHistory(text,rec,answer);pendingQuestion='';}} if(e.target.closest('[data-open-chooser]'))u.openChooser()});
+ document.addEventListener('click',e=>{let quick=e.target.closest('[data-quick]');if(quick)submit(quick.dataset.quick);let matched=e.target.closest('[data-match]');if(matched){let rec=u.records.find(r=>r.id===matched.dataset.match);if(rec){let text=pendingQuestion||('Muéstrame una síntesis clínica del expediente '+rec.id);u.choose(rec);appendUser(text);showRecordIntro(rec);let answer=answerFor(text,rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);saveHistory(text,rec,answer);pendingQuestion='';}} let syntheticBtn=e.target.closest('[data-open-synthetic-report]');if(syntheticBtn&&typeof window.XRAIC_OPEN_SYNTHETIC_REPORT==='function'){window.XRAIC_OPEN_SYNTHETIC_REPORT(syntheticBtn.dataset.openSyntheticReport);window.history.replaceState(null,'','#reporte')} if(e.target.closest('[data-open-chooser]'))u.openChooser()});
  u.$('#voiceButton').onclick=()=>{u.state.voice=(u.state.voice+1)%5;let texts=['','Grabando… Pulsa de nuevo para detener.','Transcribiendo audio…','Transcripción disponible para revisión.','No fue posible transcribir el audio.'];let icons=['mic','stop','mic','check','mic'];u.$('#voiceStatus').textContent=texts[u.state.voice];u.$('#voiceStatus').className='voice-state '+(u.state.voice===1?'recording':u.state.voice===2?'processing':'');u.$('#voiceButton').innerHTML=u.svg(icons[u.state.voice]);u.$('#voiceButton').title='Estado de audio: '+(texts[u.state.voice]||'En reposo');};}
 window.XRAIC_INIT_CONSULTA=init;
 })();
