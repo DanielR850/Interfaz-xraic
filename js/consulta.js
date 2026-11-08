@@ -61,13 +61,14 @@ function submit(question){let u=U();question=question.trim();if(!question)return
  if(!matches.length){appendAI(`<p>No encontré una coincidencia suficientemente clara con esa descripción. Puedes incluir el motivo de atención, una fecha o buscar por clave sin escribir SQL.</p><button class="btn secondary small" type="button" data-open-chooser>Buscar por clave</button>`,null,'Búsqueda documental');return}
  if(matches.length>1){renderMatched(matches,question);return}
  u.choose(matches[0]);
+ appendUser(question);
 }else appendUser(question);
 let rec=u.state.record,answer=answerFor(question,rec);if(!u.$('#chatMessages').querySelector('.message.ai'))showRecordIntro(rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);u.state.turns.push({question,topic:answer.topic,answer:answer.body});saveHistory(question,rec,answer);u.$('#composerStatus').textContent='Consultando '+rec.title+' · Puedes seguir preguntando';}
 function init(){let u=U();u.answer=submit;u.showRecordIntro=showRecordIntro;
  u.$('#chatForm').onsubmit=e=>{e.preventDefault();submit(u.$('#chatInput').value)};
  u.$('#chatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submit(u.$('#chatInput').value)}};
  u.$('#emptySelect')?.addEventListener('click',u.openChooser);
- document.addEventListener('click',e=>{let quick=e.target.closest('[data-quick]');if(quick)submit(quick.dataset.quick);let matched=e.target.closest('[data-match]');if(matched){let rec=u.records.find(r=>r.id===matched.dataset.match);if(rec){let text=pendingQuestion||('Muéstrame una síntesis clínica del expediente '+rec.id);u.choose(rec);showRecordIntro(rec);let answer=answerFor(text,rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);saveHistory(text,rec,answer);pendingQuestion='';}} if(e.target.closest('[data-open-chooser]'))u.openChooser()});
+ document.addEventListener('click',e=>{let quick=e.target.closest('[data-quick]');if(quick)submit(quick.dataset.quick);let matched=e.target.closest('[data-match]');if(matched){let rec=u.records.find(r=>r.id===matched.dataset.match);if(rec){let text=pendingQuestion||('Muéstrame una síntesis clínica del expediente '+rec.id);u.choose(rec);appendUser(text);showRecordIntro(rec);let answer=answerFor(text,rec);appendAI(answer.body+sourceButton(rec,answer.types),rec,answer.topic);saveHistory(text,rec,answer);pendingQuestion='';}} if(e.target.closest('[data-open-chooser]'))u.openChooser()});
  u.$('#voiceButton').onclick=()=>{u.state.voice=(u.state.voice+1)%5;let texts=['','Grabando… Pulsa de nuevo para detener.','Transcribiendo audio…','Transcripción disponible para revisión.','No fue posible transcribir el audio.'];let icons=['mic','stop','mic','check','mic'];u.$('#voiceStatus').textContent=texts[u.state.voice];u.$('#voiceStatus').className='voice-state '+(u.state.voice===1?'recording':u.state.voice===2?'processing':'');u.$('#voiceButton').innerHTML=u.svg(icons[u.state.voice]);u.$('#voiceButton').title='Estado de audio: '+(texts[u.state.voice]||'En reposo');};}
 window.XRAIC_INIT_CONSULTA=init;
 })();
