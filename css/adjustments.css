@@ -147,37 +147,45 @@
 .report-field-duplicates{display:grid;gap:3px;font-size:13px;font-weight:600}
 .report-field-duplicates>div{overflow-wrap:anywhere}
 
-/* Índice rectangular fijo e independiente del scroll del documento.
-   Solo en escritorio y solo en Reporte. En móvil conserva navegación horizontal. */
+/* ÍNDICE FIJO REAL. Posicionamos el ASIDE, no la caja interna:
+   anteriormente el índice quedaba limitado por la altura del grid item. */
 @media screen and (min-width: 781px) {
-  #page-reporte .report-layout {
+  #page-reporte #reportContent.report-layout {
+    display: grid;
+    grid-template-columns: 235px minmax(0, 1fr);
     align-items: start;
   }
-  #page-reporte .report-index {
-    position: static;
-    align-self: start;
-    overflow: visible;
-    min-width: 0;
-  }
-  #page-reporte .report-index .sticky-index {
+  #page-reporte #reportContent.report-layout > .report-index {
     position: fixed;
+    z-index: 12;
     top: 84px;
     left: max(26px, calc((100vw - var(--max)) / 2 + 26px));
     width: 235px;
-    height: auto;
+    max-height: calc(100vh - 100px);
     max-height: calc(100dvh - 100px);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
+    background: var(--paper);
+    border: 1px solid var(--border);
     border-radius: 0;
-    z-index: 9;
+    padding: 0;
+  }
+  #page-reporte #reportContent.report-layout > .report-index > .sticky-index {
+    position: static;
+    top: auto;
+    overflow: visible;
+    max-height: none;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: transparent;
+  }
+  #page-reporte #reportContent.report-layout > #reportDocument {
+    grid-column: 2;
   }
   #page-reporte .report-index a {
     border-radius: 0;
-    font-weight: 600;
     padding: 9px 10px;
-  }
-  #page-reporte .report-index a.active {
-    font-weight: 700;
   }
 }
