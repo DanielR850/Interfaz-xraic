@@ -147,20 +147,26 @@
 .report-field-duplicates{display:grid;gap:3px;font-size:13px;font-weight:600}
 .report-field-duplicates>div{overflow-wrap:anywhere}
 
-/* Índice de Reporte: permanece visible al recorrer el documento (escritorio). */
-@media (min-width:781px) {
+/* Índice de Reporte: la columna ocupa toda la altura del documento.
+   El panel interior (no su columna contenedora) sigue al scroll. */
+@media screen and (min-width: 781px) {
+  #page-reporte .report-layout {
+    align-items: stretch;
+  }
   #page-reporte .report-index {
+    position: relative;
+    top: auto;
+    align-self: stretch;
+    overflow: visible;
+    max-height: none;
+    min-width: 0;
+  }
+  #page-reporte .report-index .sticky-index {
     position: sticky;
     top: 88px;
-    align-self: start;
-    min-height: 0;
     max-height: calc(100vh - 104px);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
-  }
-  #page-reporte .report-index .sticky-index {
-    position: static;
-    top: auto;
   }
 }
